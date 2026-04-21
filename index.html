@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>2026 NMTI 职场牛马录用系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,29 +14,29 @@
             --neon-red: #ff3131;
             --bg-dark: #050505;
             --card-gray: #121212;
-            /* Arco Design Tokens for spacing/rhythm */
-            --arco-line-height: 1.5;
+            --arco-line-height: 1.6; /* 移动端更宽松的行高 */
         }
 
         body {
             background-color: var(--bg-dark);
             color: #eee;
-            font-family: 'Share Tech Mono', 'ZCOOL KuaiLe', sans-serif;
+            /* 优化字体族，优先系统黑体 */
+            font-family: 'Share Tech Mono', 'PingFang SC', 'Microsoft YaHei', sans-serif;
             overflow-x: hidden;
-            user-select: none;
-            cursor: crosshair;
+            line-height: var(--arco-line-height);
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* CRT 扫描线特效 */
+        /* CRT 扫描线特效 - 降低透明度以保护移动端视力 */
         .crt::before {
             content: " ";
             display: block;
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
             z-index: 100;
-            background-size: 100% 2px, 3px 100%;
+            background-size: 100% 3px, 3px 100%;
             pointer-events: none;
         }
 
@@ -52,182 +52,159 @@
             100% { text-shadow: -0.025em 0 0 var(--neon-red), -0.025em -0.025em 0 var(--neon-green), -0.025em -0.05em 0 var(--neon-purple); }
         }
 
+        /* 移动端专用选项按钮 */
         .option-btn {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid #333;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: left;
             width: 100%;
-            padding: 1.5rem;
-            /* Arco Heading 3 */
-            font-size: 20px; 
+            padding: 1.1rem 1.25rem;
+            font-size: 1.1rem; 
+            border-radius: 6px;
             position: relative;
-            overflow: hidden;
-            line-height: var(--arco-line-height);
+            transition: all 0.1s ease;
+            margin-bottom: 0.75rem;
         }
 
-        .option-btn:hover {
+        /* 移动端点击反馈替代悬停 */
+        .option-btn:active {
+            background: rgba(188, 19, 254, 0.2);
             border-color: var(--neon-purple);
-            background: rgba(188, 19, 254, 0.15);
-            color: var(--neon-purple);
-            transform: translateX(12px);
+            transform: scale(0.98);
         }
 
-        .option-btn::after {
-            content: ">>";
-            position: absolute;
-            right: -40px;
-            transition: 0.2s;
-            opacity: 0;
-        }
+        .progress-bar { height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--neon-purple); transition: width 0.3s ease; box-shadow: 0 0 10px var(--neon-purple); }
 
-        .option-btn:hover::after {
-            right: 20px;
-            opacity: 1;
-        }
-
-        .progress-bar { height: 8px; background: #222; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--neon-purple); transition: width 0.3s ease; box-shadow: 0 0 15px var(--neon-purple); }
-
-        .analysis-card { background: #0a0a0a; border-left: 4px solid var(--neon-purple); padding: 20px; margin-top: 16px; }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        .analysis-card { background: #0a0a0a; border-left: 3px solid var(--neon-purple); padding: 1.25rem; margin-top: 1rem; border-radius: 0 4px 4px 0; }
 
         .hidden { display: none; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in { animation: fadeIn 0.5s forwards; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 
         .scan-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, transparent 0%, #000 100%);
             z-index: -1;
         }
+
+        /* 响应式排版辅助类 */
+        .mobile-title { font-size: 14vw; line-height: 1; }
+        @media (min-width: 768px) { .mobile-title { font-size: 72px; } }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen crt">
+<body class="crt">
     <div class="scan-bg"></div>
     
-    <div id="app" class="w-full max-w-4xl p-10 relative z-10">
+    <div id="app" class="w-full max-w-2xl mx-auto px-6 py-8 min-h-screen flex flex-col justify-center relative z-10">
         <!-- Start Page -->
-        <div id="start-page" class="space-y-12 text-center animate-fade-in">
-            <!-- Arco Display 3 -->
-            <h1 class="text-[72px] font-black glitch tracking-tighter italic leading-none">NMTI</h1>
-            <!-- Arco Body 1 -->
-            <p class="text-[16px] text-gray-500 uppercase tracking-widest font-mono">New-working Animal Type Indicator</p>
-            <div class="space-y-6 py-8">
-                <!-- Arco Title 1 -->
-                <p class="text-[32px] font-bold text-purple-400">2026 职场牛马鉴定系统</p>
-                <!-- Arco Body 1 -->
-                <div class="text-[16px] text-gray-300 leading-relaxed border border-gray-800 p-8 bg-black/80 text-left font-mono">
-                    <span class="text-green-500 font-bold">[ 正在接入全自动牛马分型系统... ]</span><br>
-                    <span class="text-yellow-500">未知牛马，您好，欢迎参加本轮赛博验畜。</span><br>
-                    <span class="text-red-500">请先放下体面、放空脑子，并确认您的班味尚未挥发。</span> <br>
-                    <span class="text-red-500">接下来请付薪领号，开启牛马面试。</span> 
+        <div id="start-page" class="space-y-8 text-center animate-fade-in">
+            <h1 class="mobile-title font-black glitch tracking-tighter italic">NMTI</h1>
+            <p class="text-[12px] text-gray-500 uppercase tracking-[0.2em] font-mono">New-working Animal Indicator</p>
+            
+            <div class="space-y-4 py-4">
+                <p class="text-2xl font-bold text-purple-400">2026 职场牛马鉴定</p>
+                <div class="text-[15px] text-gray-300 border border-gray-800 p-6 bg-black/60 text-left font-mono leading-relaxed">
+                    <span class="text-green-500 font-bold">[ 接入系统... ]</span><br>
+                    <span class="text-yellow-500">未知牛马，欢迎参加赛博验畜。</span><br>
+                    <span class="text-red-500">请放下体面，确认班味尚未挥发。</span> 
                 </div>
             </div>
-            <!-- Arco Heading 2 Style Button -->
-            <button onclick="startQuiz()" class="w-full py-8 text-[24px] bg-purple-700 hover:bg-purple-600 font-bold transition-all border-b-8 border-purple-900 active:border-b-0 active:translate-y-1">
-                [ 付薪领号，开启牛马面试 ]
+
+            <button onclick="startQuiz()" class="w-full py-5 text-xl bg-purple-700 hover:bg-purple-600 font-bold transition-all border-b-4 border-purple-900 active:border-b-0 active:translate-y-1">
+                [ 付薪领号，开始面试 ]
             </button>
-            <!-- Arco Body 2 -->
-            <p class="text-[14px] text-gray-600 uppercase font-mono tracking-widest italic">Interview records will be archived by the Stable Master AI.</p>
+            <p class="text-[11px] text-gray-600 uppercase font-mono tracking-widest italic opacity-60">Archived by Stable Master AI</p>
         </div>
 
         <!-- Quiz Page -->
-        <div id="quiz-page" class="hidden space-y-10">
+        <div id="quiz-page" class="hidden space-y-6">
             <div class="flex justify-between items-end font-mono">
-                <span class="text-[16px] text-purple-500 font-bold" id="step-info">RECORD: 01/30</span>
-                <span class="text-[16px] text-gray-600" id="funny-status">正在评估马蹄磨损...</span>
+                <span class="text-sm text-purple-500 font-bold" id="step-info">RECORD: 01/30</span>
+                <span class="text-xs text-gray-600" id="funny-status">评估马蹄磨损...</span>
             </div>
             <div class="progress-bar">
                 <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
             </div>
-            <div class="space-y-12">
-                <!-- Arco Heading 1 -->
-                <h3 id="question-text" class="text-[32px] font-bold leading-relaxed min-h-[6rem]"></h3>
-                <div id="options-container" class="space-y-4 max-h-[60vh] overflow-y-auto pr-4"></div>
+            <div class="space-y-6 pt-4">
+                <h3 id="question-text" class="text-2xl font-bold leading-snug min-h-[4rem]"></h3>
+                <div id="options-container" class="space-y-1"></div>
             </div>
         </div>
 
         <!-- Result Page -->
-        <div id="result-page" class="hidden space-y-10 animate-fade-in">
-            <div class="bg-[#111] border border-purple-900/50 p-10 relative overflow-hidden">
-                <div class="text-center mb-10">
-                    <p class="text-[14px] text-gray-500 uppercase font-mono tracking-widest">Final Hiring Assessment Result</p>
-                    <!-- Arco Display 1 -->
-                    <h2 id="result-title" class="text-[48px] font-black text-green-400 glitch mt-4 leading-tight">牛马判定结果</h2>
-                    <!-- Arco Heading 2 -->
-                    <p id="result-tagline" class="text-[24px] text-purple-400 mt-4 italic font-bold"></p>
+        <div id="result-page" class="hidden space-y-6 animate-fade-in pb-10">
+            <div class="bg-[#111] border border-purple-900/40 p-6 relative overflow-hidden rounded-lg">
+                <div class="text-center mb-6">
+                    <p class="text-[10px] text-gray-500 uppercase font-mono tracking-[0.2em]">Hiring Assessment Result</p>
+                    <h2 id="result-title" class="text-3xl font-black text-green-400 glitch mt-2">判定结果</h2>
+                    <p id="result-tagline" class="text-lg text-purple-400 mt-2 italic font-bold"></p>
                 </div>
 
-                <div class="space-y-10">
-                    <div class="flex flex-col gap-10 items-center">
-                        <div class="w-full max-w-lg">
+                <div class="space-y-8">
+                    <div class="flex flex-col items-center">
+                        <div class="w-full max-w-[280px] mb-6">
                             <canvas id="radarChart"></canvas>
                         </div>
-                        <div class="w-full space-y-6">
-                            <div class="bg-black p-8 border-l-8 border-purple-600">
-                                <!-- Arco Heading 3 -->
-                                <p id="result-quote" class="text-[20px] italic text-gray-200 leading-snug"></p>
+                        <div class="w-full space-y-4">
+                            <div class="bg-black p-5 border-l-4 border-purple-600 rounded-r">
+                                <p id="result-quote" class="text-lg italic text-gray-200 leading-snug"></p>
                             </div>
-                            <!-- Arco Body 1 -->
-                            <p id="result-desc" class="text-[16px] text-gray-400 leading-relaxed font-mono"></p>
+                            <p id="result-desc" class="text-[14px] text-gray-400 leading-relaxed font-mono"></p>
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-800 pt-10 space-y-8">
-                        <h4 class="text-[20px] font-bold text-gray-500 uppercase tracking-widest text-center">牛马特征分析</h4>
-                        <div id="dimension-analysis" class="space-y-6"></div>
+                    <div class="border-t border-gray-800 pt-6 space-y-4">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest text-center">牛马特征档案</h4>
+                        <div id="dimension-analysis" class="space-y-4"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
-                <!-- Arco Heading 2 style text -->
-                <button onclick="location.reload()" class="py-6 bg-gray-800 text-[20px] font-bold hover:bg-gray-700 transition-colors">[ 重新提交简历 ]</button>
-                <button onclick="copyShare()" class="py-6 bg-purple-900 text-[20px] font-bold hover:bg-purple-800 transition-colors">[ 导出牛马档案 ]</button>
+            <div class="flex flex-col gap-3">
+                <button onclick="copyShare()" class="w-full py-5 bg-purple-900 text-lg font-bold rounded active:bg-purple-800 transition-colors">[ 导出牛马档案 ]</button>
+                <button onclick="location.reload()" class="w-full py-4 bg-gray-800 text-base font-bold rounded active:bg-gray-700 transition-colors">[ 重新提交简历 ]</button>
             </div>
-            <p class="text-center text-[14px] text-gray-700 font-mono italic uppercase">System Log: Candidate is a perfect Workhorse. Recommend: Maximum Workload.</p>
+            <p class="text-center text-[10px] text-gray-700 font-mono italic uppercase">System Log: Candidate is a perfect Workhorse.</p>
         </div>
     </div>
 
     <script>
         const quizData = [
             { q: "周一早上的闹钟响起时，你通常的心理活动是？", options: [{ t: "熟练地计算离职补偿金", v: { B: 4, P: 1 } }, { t: "祈祷公司今天突然被外星人拆迁", v: { P: 5 } }, { t: "猛地坐起检查昨天邮件有没有错字", v: { W: 5, A: 2 } }, { t: "只要我睡得够死，周一就追不上我", v: { P: 5, B: 3 } }] },
-            { q: "关于“带薪摸鱼”，你最长的记录是？", options: [{ t: "30分钟起步，腿不麻不出来", v: { P: 4, B: 2 } }, { t: "蹲到坑位感应灯熄灭，在黑暗中思考宇宙", v: { P: 5 } }, { t: "5分钟，因为怕老板在群里艾特我没回", v: { W: 5 } }, { t: "不在公司摸，嫌马厩环境配不上我尊贵的身躯", v: { A: 4, B: 2 } }] },
-            { q: "当你发现工位上的绿植死掉时，你觉得：", options: [{ t: "它是替我死的", v: { P: 4, B: 3 } }, { t: "下一个就是我", v: { W: 4, P: 2 } }, { t: "挺好，正好位子空出来放我的速效救心丸", v: { W: 5, B: 1 } }, { t: "谁把它弄死的？这不符合SOP！", v: { A: 5, W: 2 } }] },
-            { q: "如果公司突然停电，你的第一动作是：", options: [{ t: "狂按Ctrl+S（即便电脑已经关了）", v: { W: 5 } }, { t: "借着黑影瞬间瞬移到公司大门口", v: { B: 5, P: 2 } }, { t: "兴奋地发群：领导，电断了，我现在去星巴克继续干", v: { A: 5 } }, { t: "趴下睡觉，主打一个随遇而安", v: { P: 5 } }] },
-            { q: "老板在群里发了一个“加油”的表情包，你会：", options: [{ t: "复制粘贴回复一排“👍”", v: { W: 4, A: 1 } }, { t: "怀疑他在阴阳怪气我进度慢", v: { P: 4, B: 2 } }, { t: "截图发给死党：看，这饼又大又圆", v: { B: 5, P: 1 } }, { t: "视而不见，只有转账才能让我有动力", v: { B: 4, P: 2 } }] },
-            { q: "关于“周报”，你的创作风格倾向于：", options: [{ t: "赛博文学：把屁大点事包装成底层逻辑构建", v: { A: 5, P: 1 } }, { t: "极简主义：做了啥，没做啥，别问", v: { P: 4, B: 3 } }, { t: "忏悔录：自我检讨没能为公司造一个亿", v: { W: 5 } }, { t: "拖延症晚期：早会前10分钟现编", v: { B: 4, P: 4 } }] },
-            { q: "如果可以选择一项职场超能力，你选？", options: [{ t: "瞬间格式化老板的全部记忆", v: { B: 5 } }, { t: "隐身，这样就没人能找我开会", v: { P: 5 } }, { t: "每天自动生成3000字优质汇报PPT", v: { A: 5, W: 2 } }, { t: "永远不需要睡觉的钢化肝脏", v: { W: 5, A: 3 } }] },
+            { q: "关于“带薪摸鱼”，你最长的记录是？", options: [{ t: "30分钟起步，腿不麻不出来", v: { P: 4, B: 2 } }, { t: "蹲到坑位感应灯熄灭，在黑暗中思考宇宙", v: { P: 5 } }, { t: "5分钟，因为怕老板在群里艾特我没回", v: { W: 5 } }, { t: "不在公司摸，嫌马厩环境配不上我", v: { A: 4, B: 2 } }] },
+            { q: "当你发现工位上的绿植死掉时，你觉得：", options: [{ t: "它是替我死的", v: { P: 4, B: 3 } }, { t: "下一个就是我", v: { W: 4, P: 2 } }, { t: "挺好，正好位子空出来放药", v: { W: 5, B: 1 } }, { t: "谁把它弄死的？这不符合SOP！", v: { A: 5, W: 2 } }] },
+            { q: "如果公司突然停电，你的第一动作是：", options: [{ t: "狂按Ctrl+S（即便电脑已关）", v: { W: 5 } }, { t: "借着黑影瞬移到公司大门口", v: { B: 5, P: 2 } }, { t: "兴奋地发群：领导，我去星巴克干", v: { A: 5 } }, { t: "趴下睡觉，主打一个随遇而安", v: { P: 5 } }] },
+            { q: "老板在群里发了一个“加油”表情包，你会：", options: [{ t: "复制粘贴回复一排“👍”", v: { W: 4, A: 1 } }, { t: "怀疑他在阴阳怪气我进度慢", v: { P: 4, B: 2 } }, { t: "截图发给死党：看，这饼又大又圆", v: { B: 5, P: 1 } }, { t: "视而不见，只有转账才有动力", v: { B: 4, P: 2 } }] },
+            { q: "关于“周报”，你的创作风格倾向于：", options: [{ t: "赛博文学：把屁大点事包装成逻辑", v: { A: 5, P: 1 } }, { t: "极简主义：做了啥，别问", v: { P: 4, B: 3 } }, { t: "忏悔录：自我检讨没造一个亿", v: { W: 5 } }, { t: "拖延症晚期：早会前10分钟现编", v: { B: 4, P: 4 } }] },
+            { q: "如果可以选择一项职场超能力，你选？", options: [{ t: "瞬间格式化老板的全部记忆", v: { B: 5 } }, { t: "隐身，没人能找我开会", v: { P: 5 } }, { t: "自动生成3000字PPT", v: { A: 5, W: 2 } }, { t: "永远不需要睡觉的钢化肝脏", v: { W: 5, A: 3 } }] },
             { q: "你对“牛马文化”的理解是？", options: [{ t: "老板洗脑用的复读录音带", v: { B: 4, P: 3 } }, { t: "墙上的口号，我心里的笑话", v: { P: 5 } }, { t: "约束弱者的枷锁，强者的武器", v: { A: 5 } }, { t: "这东西真的存在吗？", v: { P: 4, B: 1 } }] },
-            { q: "当老板说“我们不提倡加班”时：", options: [{ t: "呵呵，你猜我信不信", v: { B: 4, P: 2 } }, { t: "赶紧带回家干，别被他发现", v: { W: 5, A: 2 } }, { t: "录音存证，准备反手一个举报", v: { B: 5 } }, { t: "真的吗？那我先走了（然后因左脚先进门被裁）", v: { B: 3, P: 1 } }] },
+            { q: "当老板说“我们不提倡加班”时：", options: [{ t: "呵呵，你猜我信不信", v: { B: 4, P: 2 } }, { t: "赶紧带回家干，别被他发现", v: { W: 5, A: 2 } }, { t: "录音存证，准备反手一个举报", v: { B: 5 } }, { t: "真的吗？那我先走了", v: { B: 3, P: 1 } }] },
             { q: "你对“吗喽规划”的真实想法是：", options: [{ t: "活着", v: { P: 5, W: 3 } }, { t: "只要不被优化就行", v: { W: 4, P: 2 } }, { t: "攒够钱，去深山老林喂猪", v: { B: 5, P: 3 } }, { t: "成为那个画饼给别人吃的人", v: { A: 5 } }] },
             { q: "电梯里遇到老板问“最近忙吗？”，你会：", options: [{ t: "满脸苦相：忙炸了（实际在摸鱼）", v: { P: 4, A: 2 } }, { t: "职业微笑：还行，都在掌控中", v: { A: 4, W: 2 } }, { t: "倒苦水：老板，那个谁又不配合我", v: { A: 5, B: 2 } }, { t: "只要我闭上眼，老板就看不见我", v: { P: 5 } }] },
-            { q: "当你发现同事在朋友圈吐槽工作但没屏蔽你：", options: [{ t: "赶紧点个赞，表示“战友我懂”", v: { P: 4, W: 1 } }, { t: "截图发给HR，开启向上社交", v: { A: 5, B: 2 } }, { t: "假装没看见，觉得这吗喽离死不远了", v: { P: 4 } }, { t: "默默评论：别发了，老板在后面看着你呢", v: { B: 4, P: 1 } }] },
-            { q: "面对那个“只会提意见从不干活”的人：", options: [{ t: "内心：CNM；嘴上：您说的对", v: { W: 5, P: 3 } }, { t: "每次开会都用逻辑把对方怼到墙上", v: { A: 5, B: 2 } }, { t: "这种人一般是老板亲戚，我忍", v: { W: 5 } }, { t: "把他的活悄悄挪到他名下", v: { B: 5, A: 2 } }] },
+            { q: "当你发现同事吐槽工作没屏蔽你：", options: [{ t: "点个赞，表示“战友我懂”", v: { P: 4, W: 1 } }, { t: "截图发给HR，开启向上社交", v: { A: 5, B: 2 } }, { t: "假装没看见，觉得他离死不远了", v: { P: 4 } }, { t: "默默评论：老板在后面看着你呢", v: { B: 4, P: 1 } }] },
+            { q: "面对那个“只会提意见不干活”的人：", options: [{ t: "内心：CNM；嘴上：您说的对", v: { W: 5, P: 3 } }, { t: "每次开会都用逻辑把对方怼死", v: { A: 5, B: 2 } }, { t: "这种人一般是老板亲戚，我忍", v: { W: 5 } }, { t: "把他的活悄悄挪到他名下", v: { B: 5, A: 2 } }] },
             { q: "马厩聚餐时，你的状态通常是：", options: [{ t: "边缘透明人，只管炫肉", v: { P: 5, B: 1 } }, { t: "气氛组组长，老板杯动我必举", v: { A: 5, W: 3 } }, { t: "手机不离手，随时准备跑路", v: { P: 4, B: 3 } }, { t: "吐槽大会，拉着同事数落制度", v: { B: 5, P: 2 } }] },
-            { q: "当你被拉进一个没有老板的“秘密吐槽群”：", options: [{ t: "观察三天，确认没卧底再发言", v: { W: 4, P: 2 } }, { t: "成为意见领袖，每天疯狂输出", v: { B: 5, P: 2 } }, { t: "潜水党，只发表情包", v: { P: 5 } }, { t: "我就是那个卧底", v: { A: 5 } }] },
-            { q: "老板要求下班后参加团建，你的第一反应：", options: [{ t: "哪种病假条看起来比较真实？", v: { B: 4, P: 4 } }, { t: "只要有免费吃的，我也能去", v: { P: 4, W: 1 } }, { t: "强颜欢笑，还要准备演讲", v: { A: 4, W: 3 } }, { t: "直接消失，人间蒸发", v: { B: 5 } }] },
-            { q: "关于“回复消息”，你的习惯通常是：", options: [{ t: "看到立刻秒回，生怕慢一秒", v: { W: 5, A: 2 } }, { t: "已读不回，等想好了再说", v: { P: 5, B: 2 } }, { t: "故意晚10分钟回，显得我很忙", v: { A: 4, P: 3 } }, { t: "只回“收到”，多一个字都浪费", v: { W: 4, B: 3 } }] },
-            { q: "当你在会议上走神被点名时，你会：", options: [{ t: "气定神闲：刚才那段我还在深度思考中...", v: { A: 5, P: 2 } }, { t: "满脸通红，疯狂翻笔记本", v: { W: 5 } }, { t: "直接道歉：不好意思，最近加班太累了", v: { W: 4, P: 3 } }, { t: "问旁边的同事：刚才丫说啥了？", v: { B: 4, P: 2 } }] },
+            { q: "当你被拉进一个“秘密吐槽群”：", options: [{ t: "观察三天，确认没卧底再发言", v: { W: 4, P: 2 } }, { t: "成为意见领袖，每天疯狂输出", v: { B: 5, P: 2 } }, { t: "潜水党，只发表情包", v: { P: 5 } }, { t: "我就是那个卧底", v: { A: 5 } }] },
+            { q: "老板要求下班后参加团建，你的反应：", options: [{ t: "哪种病假条看起来比较真实？", v: { B: 4, P: 4 } }, { t: "只要有免费吃的，我也能去", v: { P: 4, W: 1 } }, { t: "强颜欢笑，还要准备演讲", v: { A: 4, W: 3 } }, { t: "直接消失，人间蒸发", v: { B: 5 } }] },
+            { q: "关于“回复消息”，你的习惯通常是：", options: [{ t: "看到立刻秒回，生怕慢一秒", v: { W: 5, A: 2 } }, { t: "已读不回，等想好了再说", v: { P: 5, B: 2 } }, { t: "故意晚回，显得我很忙", v: { A: 4, P: 3 } }, { t: "只回“收到”，多一个字都浪费", v: { W: 4, B: 3 } }] },
+            { q: "在会议上走神被点名时，你会：", options: [{ t: "气定神闲：刚才我还在深度思考", v: { A: 5, P: 2 } }, { t: "满脸通红，疯狂翻笔记本", v: { W: 5 } }, { t: "道歉：不好意思，最近加班太累", v: { W: 4, P: 3 } }, { t: "问旁边的同事：丫说啥了？", v: { B: 4, P: 2 } }] },
             { q: "你如何看待马厩里的“透明人”？", options: [{ t: "羡慕，那是修行的最高境界", v: { P: 5 } }, { t: "鄙视，没出息的咸鱼", v: { A: 5 } }, { t: "警惕，这种人通常是扫地僧", v: { W: 4, A: 2 } }, { t: "我就是那个透明人", v: { P: 5 } }] },
-            { q: "如果老板发错消息到大群（比如骂你的话）：", options: [{ t: "假装没看见，等他撤回", v: { W: 5, P: 2 } }, { t: "快速发一堆表情包刷屏覆盖", v: { A: 4, W: 3 } }, { t: "截图，反手发给律师", v: { B: 5 } }, { t: "在下面回一个“？”", v: { B: 5, P: 1 } }] },
-            { q: "你觉得工作带给你最大的变化是：", options: [{ t: "余额没涨，但结节涨了", v: { W: 5, P: 3 } }, { t: "脾气变好了（因为已经气不动了）", v: { P: 5 } }, { t: "演技提升了，每天演稳定成年人", v: { P: 5, A: 3 } }, { t: "头发少了，但快捷键熟练了", v: { A: 4, W: 2 } }] },
+            { q: "如果老板发错消息到大群（骂你的）：", options: [{ t: "假装没看见，等他撤回", v: { W: 5, P: 2 } }, { t: "快速发一堆表情包刷屏覆盖", v: { A: 4, W: 3 } }, { t: "截图，反手发给律师", v: { B: 5 } }, { t: "在下面回一个“？”", v: { B: 5, P: 1 } }] },
+            { q: "工作带给你最大的变化是：", options: [{ t: "余额没涨，但结节涨了", v: { W: 5, P: 3 } }, { t: "脾气变好了（因为气不动了）", v: { P: 5 } }, { t: "演技提升了，每天演成年人", v: { P: 5, A: 3 } }, { t: "头发少了，快捷键熟练了", v: { A: 4, W: 2 } }] },
             { q: "如果现在可以辞职且补偿N+3：", options: [{ t: "磕头谢恩，连夜搬家", v: { B: 4, P: 3 } }, { t: "犹豫，怕下一家更烂", v: { W: 5, P: 2 } }, { t: "拿钱，反手入股竞争对手", v: { A: 5, B: 3 } }, { t: "把钱甩老板脸上", v: { B: 5 } }] },
             { q: "你对“加班费”的看法是：", options: [{ t: "那是我的脊梁赎买费", v: { W: 5, P: 2 } }, { t: "这辈子没见过这种传说", v: { B: 5, P: 3 } }, { t: "只要给够，老板是我亲爹", v: { A: 5, W: 3 } }, { t: "钱可以不要，我只要命", v: { B: 5, P: 4 } }] },
-            { q: "你的工位（物理或电脑）状态如何？", options: [{ t: "乱如二战现场，但我能精准找到", v: { B: 4, A: 3 } }, { t: "强迫症级别干净，因为没活干", v: { P: 4, A: 2 } }, { t: "满屏都是“最终版1.0”、“死也不改”", v: { W: 5 } }, { t: "只有一张老板的风景照", v: { A: 5, W: 3 } }] },
-            { q: "看到新入职应届生充满干劲时：", options: [{ t: "慈祥地看着：你还有几个月好日子", v: { P: 4, W: 2 } }, { t: "赶紧离远点，怕那股卷气伤到我", v: { B: 4, P: 3 } }, { t: "给他更多活，帮他快速成长", v: { A: 5, W: 3 } }, { t: "冷笑一声：年轻。", v: { B: 5, P: 2 } }] },
-            { q: "下班后会关闭通知吗？", options: [{ t: "关了，但手贱每隔5分钟看一眼", v: { W: 5, P: 3 } }, { t: "关得死死的，除非天塌了", v: { B: 5, P: 2 } }, { t: "不敢关，那是我的电子枷锁", v: { W: 5, A: 1 } }, { t: "我根本没有这些垃圾软件", v: { B: 5, P: 4 } }] },
-            { q: "老板画的饼，你一般怎么处理？", options: [{ t: "含泪吞下", v: { W: 5 } }, { t: "吐出来，还要踩两脚", v: { B: 5 } }, { t: "挂在墙上，提醒自己别再上当", v: { P: 5, B: 3 } }, { t: "把饼切碎，分给新来的应届吗喽", v: { A: 5, B: 2 } }] },
-            { q: "你认为职场中最大的谎言是：", options: [{ t: "以后马厩就是你的", v: { B: 4, P: 3 } }, { t: "我们是Family", v: { P: 5, B: 1 } }, { t: "做完这个项目我们就轻松了", v: { W: 5, A: 1 } }, { t: "既然大家没意见，那散会", v: { B: 3, A: 3 } }] },
-            { q: "你在厕所里听到的最劲爆秘密是？", options: [{ t: "谁跟谁好上了", v: { A: 3, P: 4 } }, { t: "谁要被拉走处理了", v: { W: 5, B: 2 } }, { t: "老板也要跑路了", v: { B: 5, P: 4 } }, { t: "没人说话，大家都在里面默默流泪", v: { P: 5, W: 4 } }] },
-            { q: "最后，你觉得这套测试准吗？", options: [{ t: "准得我想报警", v: { B: 4, P: 3 } }, { t: "不准，因为我是老板", v: { A: 5 } }, { t: "没心情看准不准，改汇报了", v: { W: 5, A: 4 } }, { t: "这种垃圾也能叫测试？", v: { B: 5 } }] }
+            { q: "你的工位（物理或电脑）状态如何？", options: [{ t: "乱如二战现场，但我能找到", v: { B: 4, A: 3 } }, { t: "强迫症级别干净，没活干", v: { P: 4, A: 2 } }, { t: "满屏都是“最终版1.0”", v: { W: 5 } }, { t: "只有一张老板的风景照", v: { A: 5, W: 3 } }] },
+            { q: "看到新入职应届生充满干劲时：", options: [{ t: "慈祥看着：你还有几个月好日子", v: { P: 4, W: 2 } }, { t: "离远点，怕那股卷气伤到我", v: { B: 4, P: 3 } }, { t: "给他更多活，帮他成长", v: { A: 5, W: 3 } }, { t: "冷笑一声：年轻。", v: { B: 5, P: 2 } }] },
+            { q: "下班后会关闭通知吗？", options: [{ t: "关了，但手贱5分钟看一眼", v: { W: 5, P: 3 } }, { t: "关得死死的，除非天塌了", v: { B: 5, P: 2 } }, { t: "不敢关，那是我的电子枷锁", v: { W: 5, A: 1 } }, { t: "我根本没有这些软件", v: { B: 5, P: 4 } }] },
+            { q: "老板画的饼，你一般怎么处理？", options: [{ t: "含泪吞下", v: { W: 5 } }, { t: "吐出来，还要踩两脚", v: { B: 5 } }, { t: "挂在墙上，提醒自己别上当", v: { P: 5, B: 3 } }, { t: "把饼切碎，分给应届吗喽", v: { A: 5, B: 2 } }] },
+            { q: "你认为职场中最大的谎言是：", options: [{ t: "以后马厩就是你的", v: { B: 4, P: 3 } }, { t: "我们是Family", v: { P: 5, B: 1 } }, { t: "做完这个项目就轻松了", v: { W: 5, A: 1 } }, { t: "大家没意见那散会", v: { B: 3, A: 3 } }] },
+            { q: "在厕所里听到的最劲爆秘密是？", options: [{ t: "谁跟谁好上了", v: { A: 3, P: 4 } }, { t: "谁要被拉走处理了", v: { W: 5, B: 2 } }, { t: "老板也要跑路了", v: { B: 5, P: 4 } }, { t: "大家都在里面默默流泪", v: { P: 5, W: 4 } }] },
+            { q: "最后，你觉得这套测试准吗？", options: [{ t: "准得我想报警", v: { B: 4, P: 3 } }, { t: "不准，因为我是老板", v: { A: 5 } }, { t: "没心情看，改汇报了", v: { W: 5, A: 4 } }, { t: "这种垃圾也能叫测试？", v: { B: 5 } }] }
         ];
 
         const resultsMap = {
@@ -238,39 +215,15 @@
         };
 
         const dimensionEval = {
-            W: [
-                { r: [0, 30], t: "马厩叛徒", d: "你对规则视若无睹，老板画的饼你甚至想吐在他脸上。你还没被裁纯粹是因为还没轮到你。" },
-                { r: [31, 60], t: "初级搬砖吗喽", d: "你是合格的砖，哪里需要往哪搬。你会在加班和摸鱼之间寻找微弱的平衡点。" },
-                { r: [61, 90], t: "标准工业电池", d: "恭喜，你是合格的5号电池。电量充足时回“收到”，没电时默默充电。你是最容易被替换的砖。" },
-                { r: [91, 120], t: "高强度耐磨牛马", d: "你已活成了公司的呼吸机。哪里有火去哪，哪里有锅你来背。建议查DNA，里面写满了SOP。" },
-                { r: [121, 150], t: "重装圣体祭品", d: "墓志铭建议写上“老板手疼不疼”。你的忍耐力跨越极限。建议直接住公司，火化能省运费。" }
-            ],
-            P: [
-                { r: [0, 30], t: "实心吗喽", d: "你竟然真的在工作？你的精神和肉体高度统一，这种纯真在2026年职场简直是活化石。" },
-                { r: [31, 60], t: "业余神游者", d: "掌握了初级摸鱼技术。身体在工位灵魂在出逃，但只要老板咳嗽一声你就会瞬间上线。" },
-                { r: [61, 90], t: "半透明社畜", d: "掌握了“薛定谔的办公”技术。肉在马厩心在环球。还没离职纯粹是因为余额在强行维持形态。" },
-                { r: [91, 120], t: "数字幽灵", d: "除非发工资，否则公司察觉不到你的存在。即便是坐在老板对面，他也只会觉得空气比较忧郁。" },
-                { r: [121, 150], t: "量子虚无奇点", d: "坐在那里的只是个自动应答器。精神已在三体投胎。只要你不尴尬，尴尬就是老板。" }
-            ],
-            A: [
-                { r: [0, 30], t: "深海咸鱼", d: "权力对你是负担，KPI是噪音。在卷王眼里，你甚至不配作为一个分母存在。你只想安静地腐烂。" },
-                { r: [31, 60], t: "边缘观望者", d: "在“躺平”和“支棱”间横跳。偶尔产生“我能行”的错觉，但看到明天的日程表，这种幻觉立刻烟消云散。" },
-                { r: [61, 90], t: "攀爬中的工蚁", d: "对成功还有一丝幻想。你一边嫉妒上层一边压榨自己，在焦虑的钢丝上走得摇摇欲坠。" },
-                { r: [91, 120], t: "饥渴的马厩饿狼", d: "眼里没有同事只有减速带。每一封邮件都充满了“顺我者昌，逆我者扣绩效”的肃杀之气。" },
-                { r: [121, 150], t: "顶级掠食暴君", d: "你正在重塑马厩生态。不需要睡眠只需要更多KPI。建议直接收购公司，老板耽误你进步了。" }
-            ],
-            B: [
-                { r: [0, 30], t: "棉花糖吗喽", d: "老板说左你绝不向右。温顺得像个刚出厂的扫地机，遇到障碍只会打转，是HR最爱的无害耗材。" },
-                { r: [31, 60], t: "受潮的火柴", d: "内心有刺但不多。会在被窝里模拟怼赢领导，但开会依然露出标志性的“您说得对”。" },
-                { r: [61, 90], t: "放射性反骨", d: "内心藏着小尖刀。离爆发只差一个报销单。同事能感觉到你身上隐约的“毁灭气息”。" },
-                { r: [91, 120], t: "自毁式核弹头", d: "离职信就在指尖，代码格式化就在草稿箱。老板和你说话时，通常要穿上防弹背心。" },
-                { r: [121, 150], t: "公司终结者", d: "你不想带走东西，只想带走整家公司。存在的意义就是测试劳动法底线，看规则崩塌。" }
-            ]
+            W: [{ r: [0, 30], t: "马厩叛徒", d: "你对规则视若无睹，老板画的饼你甚至想吐在他脸上。" }, { r: [31, 60], t: "搬砖吗喽", d: "你是合格的砖，哪里需要往哪搬。在加班和摸鱼间寻找微光。" }, { r: [61, 90], t: "标准电池", d: "5号电池本池。电量充足时回“收到”，没电时默默挂机。" }, { r: [91, 120], t: "耐磨牛马", d: "已活成公司的呼吸机。哪里有火去哪。建议查DNA，全是SOP。" }, { r: [121, 150], t: "重装圣体", d: "墓志铭建议写“老板手疼不疼”。你的忍耐力跨越了人类极限。" }],
+            P: [{ r: [0, 30], t: "实心吗喽", d: "你竟然真的在工作？你的纯真在2026年简直是职场活化石。" }, { r: [31, 60], t: "业余神游", d: "掌握初级摸鱼。身体在工位灵魂在出逃，老板咳嗽你会瞬间上线。" }, { r: [61, 90], t: "半透明社畜", d: "薛定谔的办公。还没离职纯粹是因为余额在强行维持肉体形态。" }, { r: [91, 120], t: "数字幽灵", d: "除非发工资，否则公司察觉不到你。坐在老板对面他只会觉得空气忧郁。" }, { r: [121, 150], t: "量子奇点", d: "精神已在三体投胎。只要你不尴尬，尴尬的就是老板。" }],
+            A: [{ r: [0, 30], t: "深海咸鱼", d: "权力对你是负担。在卷王眼里，你甚至不配作为一个分母存在。" }, { r: [31, 60], t: "边缘观望", d: "偶尔产生“我能行”的错觉，看到日程表幻觉立刻烟消云散。" }, { r: [61, 90], t: "攀爬工蚁", d: "对成功还有幻想。你一边嫉妒上层一边压榨自己，走在焦虑钢丝上。" }, { r: [91, 120], t: "马厩饿狼", d: "眼里没有同事只有减速带。每一封邮件都充满了扣绩效的肃杀之气。" }, { r: [121, 150], t: "掠食暴君", d: "你在重塑马厩生态。不需要睡眠只需要更多KPI。老板耽误你进步了。" }],
+            B: [{ r: [0, 30], t: "棉花糖", d: "老板说左你绝不向右。HR最爱的无害耗材，遇到障碍只会原地打转。" }, { r: [31, 60], t: "受潮火柴", d: "内心有刺但不多。会在被窝里模拟怼赢领导，开会依然“您说得对”。" }, { r: [61, 90], t: "放射反骨", d: "内心藏着小尖刀。离爆发只差一个报销单。同事能感觉到你的毁灭气息。" }, { r: [91, 120], t: "自毁核弹", d: "离职信就在指尖。老板和你说话时，通常需要穿上心理防弹背心。" }, { r: [121, 150], t: "公司终结者", d: "存在的意义就是测试劳动法底线。你只想带走整家公司。" }]
         };
 
         let currentStep = 0;
         let scores = { W: 0, P: 0, A: 0, B: 0 };
-        const statusPhrases = ["评估马蹄磨损...", "简历水分脱干中...", "探测脊梁骨残余...", "正在评估背锅潜力...", "正在同步HR黑名单...", "即将揭晓判定..."];
+        const statusPhrases = ["评估马蹄磨损...", "简历水分脱干...", "探测脊梁骨残余...", "评估背锅潜力...", "同步HR黑名单..."];
 
         function startQuiz() {
             document.getElementById('start-page').classList.add('hidden');
@@ -296,7 +249,6 @@
             });
 
             document.getElementById('progress-fill').style.width = `${(currentStep / quizData.length) * 100}%`;
-            container.scrollTop = 0;
         }
 
         function handleSelect(val) {
@@ -312,15 +264,14 @@
         function showResult() {
             document.getElementById('quiz-page').classList.add('hidden');
             document.getElementById('result-page').classList.remove('hidden');
+            window.scrollTo(0,0);
 
             const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
             const primaryKey = sorted[0][0];
             const secondaryKey = sorted[1][0];
-            
             const roleGroup = resultsMap[primaryKey];
             const result = roleGroup[secondaryKey] || roleGroup[primaryKey];
 
-            document.getElementById('result-title').innerText = "牛马判定结果";
             document.getElementById('result-tagline').innerText = result.title + " | " + result.tagline;
             document.getElementById('result-quote').innerText = `“${result.quote}”`;
             document.getElementById('result-desc').innerText = result.desc;
@@ -328,7 +279,7 @@
             const analysisContainer = document.getElementById('dimension-analysis');
             analysisContainer.innerHTML = '';
             
-            const labelsMap = { W: '录用指征：耗材潜力 (W)', P: '录用指征：摸鱼系数 (P)', A: '录用指征：卷王指标 (A)', B: '录用指征：风险评估 (B)' };
+            const labelsMap = { W: '耗材潜力 (W)', P: '摸鱼系数 (P)', A: '卷王指标 (A)', B: '风险评估 (B)' };
             ['W', 'P', 'A', 'B'].forEach(dim => {
                 const score = scores[dim];
                 const tierList = dimensionEval[dim];
@@ -337,14 +288,14 @@
                 const div = document.createElement('div');
                 div.className = "analysis-card animate-fade-in";
                 div.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-[20px] font-bold text-gray-400 uppercase font-mono">${labelsMap[dim]} [${score}]</span>
-                        <span class="text-[22px] text-purple-400 font-bold font-mono">${tier.t}</span>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-gray-500 font-mono uppercase">${labelsMap[dim]}</span>
+                        <span class="text-sm text-purple-400 font-bold">${tier.t} [${score}]</span>
                     </div>
-                    <div class="h-2 bg-gray-900 w-full mb-4">
-                        <div class="h-full bg-purple-700" style="width: ${Math.min(100, (score/150)*100)}%"></div>
+                    <div class="h-1.5 bg-gray-900 w-full mb-3 rounded-full">
+                        <div class="h-full bg-purple-700 rounded-full" style="width: ${Math.min(100, (score/150)*100)}%"></div>
                     </div>
-                    <p class="text-[16px] text-gray-400 leading-relaxed font-mono italic">${tier.d}</p>
+                    <p class="text-[13px] text-gray-400 font-mono italic">${tier.d}</p>
                 `;
                 analysisContainer.appendChild(div);
             });
@@ -357,21 +308,21 @@
             new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['耗材潜力', '摸鱼系数', '卷王指标', '风险评估'],
+                    labels: ['耗材', '摸鱼', '卷王', '风险'],
                     datasets: [{
                         data: [scores.W, scores.P, scores.A, scores.B],
-                        backgroundColor: 'rgba(188, 19, 254, 0.25)',
+                        backgroundColor: 'rgba(188, 19, 254, 0.2)',
                         borderColor: '#bc13fe',
                         pointBackgroundColor: '#00ff41',
-                        borderWidth: 3
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     scales: {
                         r: {
-                            angleLines: { color: '#444' },
-                            grid: { color: '#444' },
-                            pointLabels: { color: '#aaa', font: { size: 18, family: 'Share Tech Mono' } },
+                            angleLines: { color: '#333' },
+                            grid: { color: '#333' },
+                            pointLabels: { color: '#888', font: { size: 12, family: 'Share Tech Mono' } },
                             ticks: { display: false },
                             suggestedMin: 0
                         }
@@ -382,7 +333,7 @@
         }
 
         function copyShare() {
-            const text = `我参加了2026 NMTI牛马录用初筛，最终判定为[${document.getElementById('result-tagline').innerText}]，推荐直接入厩。#NMTI录用鉴定报告`;
+            const text = `2026 NMTI 录用判定：[${document.getElementById('result-tagline').innerText}]。推荐入厩等级：SSS。#职场牛马录用系统`;
             const el = document.createElement('textarea');
             el.value = text;
             document.body.appendChild(el);
